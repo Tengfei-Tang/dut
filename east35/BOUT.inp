@@ -1,0 +1,478 @@
+# settings file for BOUT++ UEDGE benchmark test
+
+##################################################
+# settings used by the core code
+
+NOUT = 200          # number of time-steps
+TIMESTEP = 0.5      # time between outputs in unit tbar
+
+wall_limit= -20.30   # wall time limit (in hours)
+ShiftXderivs = true # use shifted radial derivatives?
+TwistShift = true   # use twist-shift condition?
+ShiftOrder = 0
+TwistOrder = 0
+
+non_uniform = true  # grid points distance, dx
+
+MZ = 2              # number of points in z direction (2^n + 1)
+ZPERIOD = 1         # Fraction of a torus to simulate
+
+#ZMIN = 0.0
+#ZMAX = 5.5460e-02
+
+MXG = 2
+MYG = 2
+
+grid = "east35/EAST_daoyuan_90_110_132_64.nc"
+#grid= "east062585.03800_x260y64_psi085to105_x108.nc"
+#grid = "d3d_field144981_085_110.nc"
+#grid = "comhl2a/hl2a_24959_260_64_80_110_d8_tifit.nc"
+#grid = "cmod_08MA_1100223012_1150_36x32y_0.9psi1.05_v1.bout.nc"
+#grid = "data/CMod_1100303017_01033_260x64y_0.9psi_v1.bout.nc"
+
+##!NB: NXPE must be divided by (NX-4), while 4 is the guard cells
+NYPE =16                   # X parallelised if > 1, NXPE*NYPE=mppwidth  
+ 
+dump_format = "nc"         # NetCDF format
+restart_format = 'nc'      # Restart file format
+[laplace]
+laplace_nonuniform = true  # grid points distance, dx 
+nonuniform = true          # grid points distance, dx
+
+[comms]
+async = false              # Use asyncronous sends?
+pre_post = false           # Post receives as early as possible
+group_nonblock = false     # Use non-blocking group operations?
+
+##################################################
+# FFTs
+
+[fft]
+
+fft_measure = true         # If using FFTW, perform tests to determine fastest method
+
+
+##################################################
+# derivative methods
+
+[ddx]
+
+first = C4      # order of first x derivatives (options are 2 or 4)
+second = C4     # order of second x derivatives (2 or 4)
+upwind = W3     # order of upwinding method (1, 4, or 0 = TVD)
+
+[ddy]
+
+first = C4
+second = C4
+upwind = W3
+
+[ddz]
+
+first = C4
+second = C4
+upwind = W3
+
+##################################################
+# Solver settings
+
+[solver]
+
+# mudq, mldq, mukeep, mlkeep preconditioner options
+mxstep = 100000   # Maximum number of internal steps
+ATOL = 1.0e-10    # absolute tolerance
+RTOL = 1.0e-7     # relative tolerance
+
+##################################################
+# settings for trans_neu model
+
+[trans_neu]
+
+##### Solve equations ############################
+Solving_Eq_Ni = true
+Solving_Eq_Ti = true
+Solving_Eq_Te = true
+Solving_Eq_Vi = true
+Solving_Eq_Nn = false
+Solving_Eq_phi01 = true
+Solving_Eq_U00 = true
+
+minimum_val=1.e-10              # minimum value to protect Ni Nn Nm from being zero
+noshear = false                 # zero all shear
+include_curvature = false       # include curvature drive term?
+curvature_phi = false           # Include grad(Vexb) effects?
+diamag = false                  # Include diamagnetic effects?
+energy_flux = true             # Include energy flux effects?
+terms_cross = true              # Include cross terms in the potential equation?
+gyroviscous = false             # Include gyroviscous terms in vorticity equation?
+include_J0 = false              # Include driven current in vorticity equation?
+J1_all = true                   # Calculate the parallel current from ohm's law 
+J1_no_density = false           # just for test of density effect in the ohm's law
+Turb_Diff_on = false            # if true, turbulent diffusion on, but recently not available  
+terms_Ve = false                #if true, with Ve terms in the Te equation
+thermal_force = false           #if true, with current in the Te equation
+terms_spitzer_resist = false
+terms_radial_conv = true        #if true, with radial diffusive convection terms 
+
+###***Parameters of basic physiscs  ***##
+
+NZ = 1                          # maximum grid number in Z; 2D NZ=1; 3D NZ=MZ-1
+
+AA = 2.0                        # AA=Mi/Mp, ion mass in unit of proton mass 
+ZZ = 1.0                        # charge state
+
+test_f1=1.0
+test_f2=1.0
+test_f3=1.0
+q95_input = 4.305                  # q at normalized psi=0.95, for thermal conductivity limitation
+q_alpha=1.0
+Lnn_min = 1.e-3                 # unit m, density length at largest density gradient, for Diffc_nn_perp limitation   
+Te_x=10.0                       # eV, normalized Temprature parameter  
+Ti_x=10.0                       # eV
+Tm_x=0.02580                    # eV multiply 1.1604e^4 transfer to unit K, injected molecule temperature   
+Ni_x=1.0                        # 1.e19 m^-3, normalized Density parameter
+density_unit = 1.e20            #  m^-3, calculate quantities in real SI units 
+
+#bmag=2.35                      # Tesla,normalized Magnetic field parameter, loaded automatically from g-file 
+#Lbar=1.0                       # m, normalized Length parameter, loaded automatically from g-file
+Lp_crit =5.e-6                  # m, for turbulent diffusion triggering, but recently not available
+
+Mi=1.0                          # in unit Mass of ion, Mi=2.*mp=2.*1.6726e^-27 kg
+Mn=1.0                          # in unit Mass of ion, Mi=2.*mp=2.*1.6726e^-27 kg
+Mm=2.0                          # in Mi
+W_ionz=20.                      # in unit eV, energy lose per ionization 
+W_diss=4.5                      # in unit eV , Te lossing per molecule dissociation
+W_bind=0.5                      # in unit eV, bind energy during molecule dissociation
+W_rec=4.5                       # in eV, electron gaining energy per recombination, max=13.6eV
+
+decay_bndry= false
+
+leakage_bndry=true
+
+energy_flux_bndry=false
+R_major=1.65
+r_minor=0.4
+P_input=3.5e6
+Elgt=1.1
+chi_coef=88.6329  ##1.5 
+q_input=73764.2
+
+
+
+### diffusion parameters in unit m^2/s, (default value),
+
+Diffc_ni_perp=1.                # perp=perpendicular,  Diff= Diffusion  
+Difft_ni_perp=1.0               # t=turbulent, c=classical
+          
+chic_i_perp=1.                  # i=ion, 
+chit_i_perp=4.0                   
+        
+chic_e_perp=1.                  # e=electron    
+chit_e_perp=6.0
+
+chic_n_perp =0.4                # neutral atom, not in function due to Tn=Ti assumption recently
+
+### step function of diffusion coefficients, priority lower than diffusion_coef_Hmode
+diffusion_coef_step_function = false	 
+diffusion_coef_step0 = 0.1      # when normalized psi <= 1.0,
+diffusion_coef_step1 = 1.0      # when normalized psi >  1.0,
+
+load_grid_trans = true          # read diffusion transport coefficient from grid file
+
+### diffusion coefficients for initial_profile_Hmode
+diffusion_coef_Hmode = false    # NB: Be sure initial_profile_Hmode=true also
+diffusion_coef_Hmode0 = 1.      # value at xin
+diffusion_coef_Hmode1 = 1.e10   # maximum value limited especially when normalized psi >  1.0,
+
+###***Controls for Sheath boundary condition  ***##
+## NB: if there is a blowup/non-finite of Vi at y=0 which is due to Sheath Boundary, it has to
+##     run with 'Sheath_BC = false' for a while and then continue run with 'Sheath_BC = true'  
+##     or turn on initial_SOL_edgeval option
+
+Sheath_BC = true                   # Apply Sheath Boundary condition
+Ni_Zero_Grad = false               # Apply Zero gradient boundary condition for Ni
+Ni_Constant_Grad = false           # Apply constant gradient boundary condition for Ni
+Sheath_BC_phi = true               # Apply Sheath Boundary condition for potential?
+Secondary_electron_emission = false
+delta = 0.0
+C_fe_sheat= 2.3                    # coefficient of parallel heat transmission in sheat BC 
+C_fi_sheat = 0.0
+Sheath_width = 0                   # Sheath width, ny grid numbers, for Sheath BC test only 
+#Sheath_BC_x0=0.906 # sheat boundary condition start from x0 (i.e., cbm x0=54./64.,hl2a x0=58/64)
+Sheath_BC_x0=0.
+
+###***Controls for particle recyclings at the plates and wall ***##
+
+SBC_particle_recycle = true        # if true, particle recycling at Sheath BC (or divertor plates)
+Wall_particle_recycle = true       # if true, particle recycling at wall
+Lni_wall = 0.05                    # unit m, Gradient length Ni at wall
+alpha_vn = 0.
+angle_B_plate = 3.1415926/6.       # unit rad, angle between magnetic field and divertor plate
+Rate_recycle_wall = 1.             # wall recycling rate; value in range [0,1], Gamma_nn_wall=R_cycl_wall*Gamma_ni
+Rate_recycle_div = 1.              # divertor recycling rate; value in range [0,1], Gamma_nn=R_cycl_div*Gamma_ni
+
+###***Controls of different terms ***##
+
+term_GparkappaTe_GparTe = true     # it causes error of 'tstep too small' when 3D SMBI   
+
+terms_IOL = false                  # with Ion Orbit Loss
+xout= 173                          # out flux surface of IOL
+P_N = 24                           # grid number of pitch angle
+
+terms_recombination = false
+terms_exb = false
+terms_exb_u00 = false 
+#######################################################################
+# BRACKET_METHOD flags:
+# 0:BRACKET_STD; derivative methods will be determined
+#   by the choices C or W in this input file
+# 1:BRACKET_SIMPLE; 2:BRACKET_ARAKAWA; 3:BRACKET_CTU.
+
+bracket_method_exb = 2             # differencing schemes for ExB
+bracket_method_mag = 2             # differencing schemes for magnetic flutter
+####################################################################### 
+terms_Gradpar_pn = true
+terms_Gradpar_eta0n = true
+terms_Diffcnn_par = true
+terms_NnGradpar_Vn = false         # Be true only when ddt(Vn)=0
+terms_NnGradpar_Vi = false        
+terms_Gradperp_diffcoefs = true
+terms_Gradpara_diffcoefs = true
+
+###*** external sources  ***###
+external_sources = false           # priority lower than extsrcs_balance_diffusion
+extsrcs_balance_diffusion = false  # external sources equal to diffusion terms 
+
+x0_extS = 0.98                     # a.u. location of pedestal relative to normalized psi 
+width_extS = 0.018                 # a.u. width of pedestal
+coef_coregrad_extS = 0.0021        # a.u. coefficient of core gradient, or pedestal top gradient 
+amp_spi_ext = 2.e1                 # N0/s
+amp_see_ext = 2.e4                 # eV*N0/s
+amp_sei_ext = 2.e4                 # eV*N0/s
+
+###***Controls of nl_filter to smooth data ***##
+
+nlfilter_noisy_data = false        # if true, nl_filter(var) smooth data
+nlfilter_Gradpar_logNn = false
+nlfilter_Vnpol = false
+filter_para = 0.2                  # value=[0,1], smooth order
+
+###***Controls of initial profiles  ***##
+# Initial file parameters
+# if initial_profile_exp=true, i.e, Te=Te_edge+Te_core/(1+exp(2.*(GlobalX-Initfile_x0)/Initfile_w_ped))
+# if initial_profile_linear=true, i.e,  Te=Te_edge - dTedx_xin_au*(psi_xout_y0-psi)
+
+profiles_lasttimestep = false       # priority I, avalable once cont run 'restart append' fail or re-run since t=t0, but call 'lasttimestep.pro' to generate 'lstime_Ni.txt' etc first 
+load_grid_profiles = false          # priority II,if true, load initial profiles of Te Ti Ni from grid file, but a problem in the code needs to be corrected
+load_experiment_profiles =true      # priority III,if true, experiment  Te Ti Ni from grid file
+initial_profile_exp = false         # priority III,if true, initial profiles of Te Ti Ni are in form of Te=Te_edge+Te_core/(1+exp(2.*(GlobalX-Initfile_x0)/Initfile_w_ped))  
+initial_profile_linear = false      # priority III,if true, initial profiles of Te Ti Ni are in form of Te=Te_edge - dTedx_xin_au*(psi_xout_y0-psi)
+initial_profile_Hmode = false       # priority III, if true, initial profiles of TeNiTi, same shape, Hmode_function((psi_hat-x0_ped)/width_ped,coef_coregrad_ped,Te_core,Te_edge) 
+
+initial_SOL_edgeval = false         # set values of TiNiTe at SOL region with their values at edge/xout
+
+# paramters public for all kinds of profiles
+Te_core = 310.                      # eV, NB: enlarged in Hmode
+Te_edge = 18.88                     # eV,
+Ti_core = 310.                      # eV
+Ti_edge = 18.88                     # eV
+Ni_core = 2.53                      # 1.e20 m^-3
+Ni_edge = 0.54                      # 1.e20 m^-3, 
+
+dNidx_xin_au = -126.484             # a.u. NB: same as bndry of Ni at xin
+dTidx_xin_au = -4778.0              # a.u. NB: same as bndry of Ti at xin
+dTedx_xin_au = -4778.0              # a.u. NB: same as bndry of Te at xin
+
+# parameters of initial_profile_exp
+Initfile_x0 = 0.4                   # a.u. x= jx/NX
+Initfile_w_ped = 0.2                # a.u.
+
+# parameters of initial_profile_linear
+
+#psi_xout_y0 = 0.24340              # m^2 T, psi at xout or nxmax-2 and y=0 (cbm64) for initial_profile_linear
+psi_xout_y0 = 0.183348              # (hl2a w/ X point), different for different g-file 
+
+# parameters of initial_profile_Hmode
+x0_ped = 0.98                       # a.u. location of pedestal relative to normalized psi 
+width_ped = 0.018                   # a.u. width of pedestal
+coef_coregrad_ped = 0.01            # a.u. coefficient of core gradient 
+coef_corenlarge_ped = 18.           # a.u. coefficient of core enlarge
+
+###* Controls of fueling, set SMBI locations, constant flux BC 
+
+SMBI_LFS = false                    # SMBI at low field side
+
+Nm0=1.e0                            # 1.e20 m^-3
+Vm0=-1000.                          # in unit m/s
+
+CF_BC_x0=1.03                       # parameters of constant flux boundary condition
+#CF_BC_y0=0.48                      # circle geometry w/o X point 
+#CF_BC_y1=0.52
+CF_BC_y0=0.59                       # hl2a circle geometry w/ X point, different for different g-file 
+CF_BC_y1=0.64                       # hl2a circle geometry w/ X point
+CF_BC_z0=0.                         # smbi range z_left
+CF_BC_z1=2.                         # smbi range z_right
+
+### Spitzer resistivity 
+spitzer_resist = true
+
+###########################################################li2016
+xloc = 1.0                 # Position in X direction, normalized Psi
+yloc = 38                  # Position in Y direction, grid index RF_sheath location
+y_omp = 38                 # Position in Y direction, grid index of outer midplane
+
+iterative_phi0 = true
+J_para0=true
+sbc_lambda0 = 1.0e0
+sbc_lambda1 = 1.0e5
+Mu_perp = 1.0e1
+D_perp = 0.0
+Mu_para = 1.0e6
+RF_coef = 10.0
+###########################################################liend
+
+### Controls of bootstrap current calculation for elm-pb cases
+BScurrent = false         # if true, calculate bootstrap current
+Aratio = 0.35
+
+##################################################
+# settings for individual variables
+# The section "All" defines default settings for all variables
+# These can be overridden for individual variables in
+# a section of that name.
+
+[All]
+scale = 0.0 # default size of initial perturbations
+
+# initial profile shape
+# ---------------------
+# 0 - constant
+# 1 - Gaussian
+# 2 - Sinusoidal
+# 3 - Mix of mode numbers (like original BOUT)
+
+#xs_opt = 1
+#ys_opt = 2
+#zs_opt = 3
+
+#xs_s0 = 0.5
+#xs_wd = 0.5
+
+#ys_mode = 1
+
+#zs_mode = 1 # toroidal mode number
+
+# boundary conditions
+# -------------------
+# dirichlet      = zero value
+# dirichlet(val) = Fix at val
+
+# neumann        = zero gradient 
+# neumann (val)  = Fix gradient (NB:boundary_stardard.cxx should be modified)
+# NB one bug: neumann(val) for a positive val, gradient at _xin is positive but at _xout is negative!!! Be careful!
+# zerolaplace    = Laplacian = 0, decaying solution
+# constlaplace   = Laplacian = 0, decaying solution
+#
+# Regions: core, pf, sol, target
+#          xin, xout, ydown, yup, all
+#
+# All boundaries can be made relaxing e.g.
+#    "relax(dirichlet(1.))" will relax towards 1
+# To specify a relaxation rate (1/timescale), pass an argument to relax:
+#    "relax(dirichlet(1.), 10)" sets the rate to 10. (the default).
+#
+# NOTE: The boundary quantities are normalised to
+#       the values set in the grid file:
+# Te_x = 10 eV
+# Ni_x = 1.e19 m^-3
+# Vi_x = 21850 m/s  NB: Depends on bmag, Te_x, AA and ZZ
+
+
+#bndry_all = neumann # Default for all variables, boundaries
+#bndry_all = dirichlet ## circle
+
+[Ni]
+
+#bndry_xin  = neumann(-126.484)              # NB: same as dNidx_xin_au
+bndry_xin  = relax(dirichlet(0.12988))    
+bndry_pf  = neumann                          
+bndry_xout = none
+#bndry_xout  = relax(dirichlet(0.62))     
+
+[Vi]
+
+bndry_xin = neumann   
+bndry_xout  = neumann 
+
+[Te]
+
+#bndry_xin = neumann(-4778.38)               # NB: same as dTedx_xin_au
+bndry_xin  = relax(dirichlet(9.41559))    
+bndry_xout = none
+bndry_pf  = neumann
+#bndry_xout  = relax(dirichlet(3.22))      
+
+
+[Ti]
+
+
+#bndry_xin = neumann(-4778.38)               # NB: same as dTidx_xin_au
+bndry_xin  = relax(dirichlet(9.41559))    
+bndry_xout  = none
+bndry_pf  = neumann
+#bndry_xout  = relax(dirichlet(3.22))       
+
+
+[Nn]
+bndry_xin =neumann
+bndry_xout =neumann                          # NB: not necessary to turn off when recycling
+#bndry_pf = relax(dirichlet(1.e-10))
+
+[Tn]
+bndry_xin =neumann
+
+bndry_xout =neumann
+
+[Vn]
+
+bndry_xin = neumann
+bndry_xout = neumann
+
+[Nm]
+bndry_xin = neumann
+bndry_xout =neumann
+
+[Vm]
+
+bndry_xin = neumann
+bndry_xout = neumann
+
+###################################li2016
+[P]     # pressure
+bndry_xin = neumann
+bndry_xout = neumann
+#scale = 1.0e-5
+
+[Psi]   # Vector potential
+#scale = 1.0e-5
+# zero laplacian
+bndry_xin = zerolaplace
+bndry_xout = zerolaplace
+
+[J]     # parallel current
+
+bndry_xin = neumann
+
+[Vpar]
+
+bndry_xin = neumann
+
+[phi01] # Poterntial
+
+bndry_xin = neumann(0)
+bndry_xout = neumann
+bndry_pf = neumann
+
+[U00]
+
+##################################liend
